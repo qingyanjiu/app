@@ -1,22 +1,21 @@
 package moku.site.core;
 
+import moku.site.bean.Task;
 import moku.site.utils.HttpRequestUtils;
 
 public class RequestWorker implements Runnable {
 
-    private String url = "";
+    private final Task task;
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public RequestWorker(Task task){
+        this.task = task;
     }
 
     @Override
     public void run() {
-        String res = HttpRequestUtils.postRequestUrl(this.url);
+        String res = "";
+        if(this.task != null)
+            res = HttpRequestUtils.postRequestUrl(this.task.getUrl());
         if(res != null){
             System.out.println(res);
         }
