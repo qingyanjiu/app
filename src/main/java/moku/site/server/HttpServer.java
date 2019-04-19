@@ -19,17 +19,22 @@ public class HttpServer {
     }
 
     public void start() throws InterruptedException{
-        ServerBootstrap bootstrap = new ServerBootstrap();
         EventLoopGroup boss = new NioEventLoopGroup();
         EventLoopGroup work = new NioEventLoopGroup();
-        bootstrap.group(boss,work)
-                .handler(new LoggingHandler(LogLevel.DEBUG))
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new HttpServerInitializer());
+        try {
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(boss, work)
+                    .handler(new LoggingHandler(LogLevel.DEBUG))
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new HttpServerInitializer());
 
-        ChannelFuture f = bootstrap.bind(new InetSocketAddress(port)).sync();
-        System.out.println(" server start up on port : " + port);
-        f.channel().closeFuture().sync();
+            ChannelFuture f = bootstrap.bind(new InetSocketAddress(port)).sync();
+            System.out.println(" server start up on port : " + port);
+            f.channel().closeFuture().sync();
+        } finally {
+            boss.shutdownGracefully();
+            work.shutdownGracefully();
+        }
 
     }
 
