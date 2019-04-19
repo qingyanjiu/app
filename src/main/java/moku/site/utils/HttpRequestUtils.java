@@ -1,5 +1,6 @@
 package moku.site.utils;
 
+import moku.site.exception.RequestException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -7,41 +8,40 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class HttpRequestUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpRequestUtils.class);
-
-    public static String postRequestUrl(String url){
+    public static String postRequestUrl(String url) throws RequestException{
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(url);
         CloseableHttpResponse response = null;
         String result = null;
         try {
+            Thread.sleep(60000);
             response = httpclient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity);
         } catch (ClientProtocolException e) {
-            logger.error("postRequestUrl--execute post failed ["+e.getMessage()+"]");
+            throw new RequestException("execute post failed");
         } catch (IOException e) {
-            logger.error("postRequestUrl--get response content failed ["+e.getMessage()+"]");
+            throw new RequestException("get response content failed");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             if (response != null) {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    logger.error("postRequestUrl--close response failed ["+e.getMessage()+"]");
+                    throw new RequestException("close response failed");
                 }
             }
             if (httpclient != null) {
                 try {
                     httpclient.close();
                 } catch (IOException e) {
-                    logger.error("postRequestUrl--close httpclient failed ["+e.getMessage()+"]");
+                    throw new RequestException("close httpclient failed");
                 }
             }
         }

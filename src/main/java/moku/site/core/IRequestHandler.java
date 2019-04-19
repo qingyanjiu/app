@@ -1,18 +1,15 @@
 package moku.site.core;
 
 import moku.site.bean.Task;
+import moku.site.exception.HandlerException;
 
-import java.util.Map;
+import java.util.List;
 
 public interface IRequestHandler {
 
-    void addTask(Task task);
+    List<Task> getTasks();
 
-    void deleteTask(Task task);
+    List<Task> getProcessingQueue();
 
-    Map getWaitingQueue();
-
-    Map getProcessingQueue();
-
-    void doRequest();
+    void doRequest(Task newTask) throws HandlerException;
 }
