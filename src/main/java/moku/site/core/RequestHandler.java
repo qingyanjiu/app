@@ -71,6 +71,8 @@ public class RequestHandler implements IRequestHandler {
             //任务进入处理状态
             newTask.setStatus(Task.TASK_STATUS_PROCESSING);
             //请求url
+            //为防止netty线程满了阻塞，可以将请求操作放到自定义的线程池中进行处理
+            //TODO
             String res = HttpRequestUtils.postRequestUrl(newTask.getUrl());
             //任务完成，写入response和状态
             newTask.setResponse(res);
