@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 public class RequestHandler implements IRequestHandler {
@@ -23,6 +26,8 @@ public class RequestHandler implements IRequestHandler {
     private static final RequestHandler requestHandler = new RequestHandler();
 
     private static IContextContainer contextContainer = ContextContainer.getInstance();
+
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     private List<Task> allTasks = new Vector();
 
@@ -63,42 +68,8 @@ public class RequestHandler implements IRequestHandler {
 
     @Override
     public void doRequest(Task newTask) throws HandlerException{
-        allTasks.add(newTask);
-        try {
-            semaphore.acquire();
-            //新来的任务加入对象池
-            taskPool.add(newTask);
-            //任务进入处理状态
-            newTask.setStatus(Task.TASK_STATUS_PROCESSING);
-            //请求url
-            //为防止netty线程满了阻塞，可以将请求操作放到自定义的线程池中进行处理
-            //TODO
-            String res = HttpRequestUtils.postRequestUrl(newTask.getUrl());
-            //任务完成，写入response和状态
-            newTask.setResponse(res);
-            newTask.setStatus(Task.TASK_STATUS_FINISHED);
-            newTask.setDuringTime();
-            //已完成任务信息写入日志
-            logger.info("Task finished : "+newTask.getUrl());
-            //已完成任务写入数据库
-            //TODO
-            //已完成任务从列表删除
-//            allTasks.remove(newTask);
-        } catch (InterruptedException e) {
-            newTask.setDuringTime();
-            newTask.setStatus(Task.TASK_STATUS_FAILED);
-            newTask.setErrorMessage("InterruptedException occurred");
-            throw new HandlerException("task failed : "+ newTask.getUrl());
-        } catch (RequestException e) {
-            newTask.setDuringTime();
-            newTask.setStatus(Task.TASK_STATUS_FAILED);
-            newTask.setErrorMessage("request url failed:"+ newTask.getUrl());
-            throw new HandlerException("task failed : "+ newTask.getUrl());
-        } finally {
-            //从对象池删除
-            taskPool.remove(newTask);
-            semaphore.release();
-        }
+        Thread thread = new Thread(new RequestWorker(newTask,taskPool,allTasks,semaphore));
+        executorService.execute(thread);
     }
 
 }

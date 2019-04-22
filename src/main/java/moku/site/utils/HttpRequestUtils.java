@@ -19,7 +19,7 @@ public class HttpRequestUtils {
         CloseableHttpResponse response = null;
         String result = null;
         try {
-//            Thread.sleep(60000);
+            Thread.sleep(60000);
             response = httpclient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity);
@@ -27,8 +27,8 @@ public class HttpRequestUtils {
             throw new RequestException("execute post failed");
         } catch (IOException e) {
             throw new RequestException("get response content failed");
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             if (response != null) {
                 try {
