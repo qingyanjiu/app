@@ -26,8 +26,8 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestHandler.class);
 
-    private static final String PREFIX_TASKS = "tasks";
-    private static final String PREFIX_QUEUED_TASKS = "queuedTasks";
+    private static final String PREFIX_TASKS = "all-tasks";
+    private static final String PREFIX_QUEUED_TASKS = "processing-tasks";
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
@@ -74,6 +74,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 Task task = new Task();
                 task.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS").format(new Date()));
                 task.setUrl(url);
+                task.setMethod(req.getMethod().toString());
                 try {
                     requestHandler.doRequest(task);
                 } catch (HandlerException e) {

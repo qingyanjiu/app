@@ -25,31 +25,31 @@ public class App {
             if (properties != null && properties.size() > 0 && properties.get("http.server.port") != null)
                 httpServerPort = Integer.parseInt(properties.getProperty("http.server.port"));
 
-            final RequestHandler requestHandler = RequestHandler.getInstance();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-                        List<Task> list = requestHandler.getProcessingQueue();
-                        if(list.size() > 0) {
-                            System.out.println("===============All tasks:"+list.size()+"==================");
-                            for (Task task : list) {
-                                System.out.print(" Path : " + task.getUrl() +
-                                        " | Status : " + task.getStatus() +
-                                        " | Cost : " + task.getDuringTime() + " ms" +
-                                        " | Response : " + task.getResponse() +
-                                        "\n-----------------------------------------\n");
-                            }
-                            System.out.println("===============================================");
-                        }
-                        try {
-                            Thread.sleep(20000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
+//            final RequestHandler requestHandler = RequestHandler.getInstance();
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    while (true) {
+//                        List<Task> list = requestHandler.getProcessingQueue();
+//                        if(list.size() > 0) {
+//                            System.out.println("===============All tasks:"+list.size()+"==================");
+//                            for (Task task : list) {
+//                                System.out.print(" Path : " + task.getUrl() +
+//                                        " | Status : " + task.getStatus() +
+//                                        " | Cost : " + task.getDuringTime() + " ms" +
+//                                        " | Response : " + task.getResponse() +
+//                                        "\n-----------------------------------------\n");
+//                            }
+//                            System.out.println("===============================================");
+//                        }
+//                        try {
+//                            Thread.sleep(20000);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }).start();
 
             HttpServer server = new HttpServer(httpServerPort);
             server.start();

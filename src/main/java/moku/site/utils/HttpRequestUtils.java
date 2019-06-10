@@ -4,6 +4,7 @@ import moku.site.exception.RequestException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -19,7 +20,6 @@ public class HttpRequestUtils {
         CloseableHttpResponse response = null;
         String result = null;
         try {
-            Thread.sleep(60000);
             response = httpclient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity);
@@ -27,8 +27,39 @@ public class HttpRequestUtils {
             throw new RequestException("execute post failed");
         } catch (IOException e) {
             throw new RequestException("get response content failed");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    throw new RequestException("close response failed");
+                }
+            }
+            if (httpclient != null) {
+                try {
+                    httpclient.close();
+                } catch (IOException e) {
+                    throw new RequestException("close httpclient failed");
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public static String getRequestUrl(String url) throws RequestException{
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+        CloseableHttpResponse response = null;
+        String result = null;
+        try {
+            response = httpclient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity);
+        } catch (ClientProtocolException e) {
+            throw new RequestException("execute post failed");
+        } catch (IOException e) {
+            throw new RequestException("get response content failed");
         } finally {
             if (response != null) {
                 try {

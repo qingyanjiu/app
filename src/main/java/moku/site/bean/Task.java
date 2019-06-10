@@ -25,6 +25,8 @@ public class Task {
 
     private double duringTime;
 
+    private String method;
+
     public double getDuringTime() {
         return duringTime;
     }
@@ -85,5 +87,13 @@ public class Task {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 }

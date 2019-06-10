@@ -4,18 +4,14 @@ import moku.site.bean.Task;
 import moku.site.context.ContextContainer;
 import moku.site.context.IContextContainer;
 import moku.site.exception.HandlerException;
-import moku.site.exception.RequestException;
-import moku.site.utils.HttpRequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 
 public class RequestHandler implements IRequestHandler {
 
@@ -35,7 +31,6 @@ public class RequestHandler implements IRequestHandler {
     }
 
     private static final List<Task> taskPool;
-    private static final Semaphore semaphore;
 
     static {
         taskPool = new Vector();
@@ -47,8 +42,6 @@ public class RequestHandler implements IRequestHandler {
 //            Task task = new Task();
 //            taskPool.add(task);
 //        }
-        //定义信号量，数量与对象池一致
-        semaphore = new Semaphore(taskProcessNumber);
     }
 
     public static RequestHandler getInstance(){
@@ -68,8 +61,7 @@ public class RequestHandler implements IRequestHandler {
 
     @Override
     public void doRequest(Task newTask) throws HandlerException{
-        Thread thread = new Thread(new RequestWorker(newTask,taskPool,allTasks,semaphore));
-        executorService.execute(thread);
+        executorService.execute(new RequestWorker(newTask,taskPool,allTasks));
     }
 
 }
